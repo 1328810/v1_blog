@@ -1,5 +1,12 @@
 # v1_blog
 个人博客
+## 主要功能：
+文章，页面，分类目录，标签的添加，删除，编辑等。文章及页面支持Markdown，支持代码高亮。
+支持文章条件搜索。
+主题切换功能
+完整的评论功能，包括发表回复评论，支持Markdown。
+侧边栏功能，最新文章，最多阅读等。
+手机端适配(待完善)
 ## 项目截图
 ![image](https://user-images.githubusercontent.com/127709716/225201971-3deaa4a0-c6b7-482b-ac4e-f19081433949.png)
 ![image](https://user-images.githubusercontent.com/127709716/225202033-bfa58bef-e6f7-400e-9875-c119da3f5cd7.png)
