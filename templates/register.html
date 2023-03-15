@@ -1,0 +1,17 @@
+{% extends 'login.html' %}
+{{% block title %}
+        <title>奇点个人博客|用户注册</title>
+{% endblock %}
+{% block main_title %}
+<a href="/login">登录</a> / <a href="/register" class="active">注册</a>
+{% endblock %}
+{% block form %}
+    <input type="text" v-model="register_form.name" ref="register_form_name" placeholder="请输入用户名" class="register_input">
+    <input type="password" v-model="register_form.pwd" ref="register_form_pwd" placeholder="请输入密码" class="register_input">
+    <input type="password" v-model="register_form.re_pwd" ref="register_form_re_pwd" placeholder="确认密码" class="register_input">
+    <div class="code">
+        <input type="text" v-model="register_form.code" ref="register_form_code" placeholder="请输入验证码">
+        <img @click="get_random_code" src="/static/my/img/login/code.png"  alt="">
+    </div>
+    <button @click="register">注册</button>
+{% endblock %}

@@ -1,0 +1,125 @@
+
+.main {
+  width: 1200px;
+  .news_content {
+    display: flex;
+    min-height: 800px;
+    background-color: white;
+    border-radius: 5px;
+    .left {
+      width: 20%;
+      border-right: 1px solid #f0eeee;
+      ul {
+        margin-top: 20px;
+        img {
+          height: 25px;
+          border-radius: 5px;
+          margin-right: 10px;
+        }
+        li {
+          color: #333333;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          padding-left: 30%;
+          margin-bottom: 10px;
+          transition: all .1s;
+        }
+        li.active {
+          background-color: #3a8ee6;
+          color: white;
+        }
+        li:not(li.active) {
+          // 选中非active的
+          cursor: pointer;
+          &:hover {
+            color: #3a8ee6;
+          }
+        }
+      }
+    }
+    .right {
+      width: 80%;
+      padding: 20px;
+      .title {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #f0eeee;
+        padding-bottom: 10px;
+        img {
+          width: 35px;
+          border-radius: 50%;
+          margin-right: 10px;
+        }
+        h2 {
+          font-size: 20px;
+        }
+      }
+      .body {
+        margin-top: 10px;
+        ul {
+           list-style: none;
+          li {
+            height: 30px;
+            align-items: center;
+            display: flex;
+            font-size: 14px;
+            &:nth-child(1) {
+              .index {
+                background-color: #fe2d46;
+                color: white;
+              }
+
+              }
+              &:nth-child(2) {
+                .index {
+                  background-color: #ff6600;
+                  color: white;
+                }
+              }
+              &:nth-child(3) {
+                .index {
+                  background-color: #faa90e;
+                  color: white;
+                }
+              }
+            .index {
+              width: 20px;
+              height: 20px;
+              border-radius: 5px;
+              color: #333333;
+              background-color: #f0f1f4;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              margin-right: 20px;
+            }
+            a {
+              width: 77%;
+              color: #333333;
+              transition: all .2s;
+              &:hover {
+                color: #3a8ee6;
+              }
+            }
+            .num {
+              width: 20%;
+              display: flex;
+              justify-content: right;
+            }
+          }
+        }
+      }
+    }
+  }
+  .thank {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    a {
+      font-size: 14px;
+      color: #333333;
+    }
+  }
+}

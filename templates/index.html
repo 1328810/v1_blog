@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load my_tag my_filter%}
+<head>
+    <meta charset="UTF-8">
+    {% block title %}
+            <title>奇点个人博客|首页</title>
+    {% endblock %}
+    <link rel="stylesheet" href="/static/my/css/reset.css">
+    <link rel="stylesheet" href="/static/my/css/base.css">
+    {% block css %}
+        <link rel="stylesheet" href="/static/my/css/index.css">
+    {% endblock %}
+    <link rel="stylesheet" href="/static/elementui/theme-chalk/index.css">
+    <link rel="stylesheet" href="/static/fontawesome-free-5/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <link rel="stylesheet" :href="'/static/my/css/theme/'+ theme + '.css'">
+        <nav class="nav_bg">
+            <div class="left" id="dynamic_nav">
+                {% dynamic_navigation request %}
+                {% block search %}
+                    <div class="search">
+                        <input type="text" @keydown.enter="search()" class="search_box" v-model="search_key" placeholder="搜索你想要的内容">
+                        <button @click="search()"><i class="fa fa-search"></i></button>
+                    </div>
+                {% endblock %}
+
+            </div>
+            <div class="right">
+                <img v-show="theme ==='light'" src="/static/my/img/nav/light.svg" @click="setTheme('dark')"  alt="">
+                <img v-show="theme ==='dark'" src="/static/my/img/nav/dark.svg" @click="setTheme('light')" alt="">
+                {% if request.user.username %}
+                    <el-dropdown :hide-on-click="false">
+                      <span class="el-dropdown-link">
+                          {{ request.user.username }}
+                        <i class="el-icon-arrow-down el-icon--right"></i>
+                      </span>
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item><a href="/backend/">个人中心</a></el-dropdown-item>
+                        <el-dropdown-item><a href="/backend/edit_avatar/">修改头像</a></el-dropdown-item>
+                        {% if request.user.is_superuser %}
+                        <el-dropdown-item><a href="/backend/add_article/">发布文章</a></el-dropdown-item>
+                        <el-dropdown-item><a href="/admin/">后台管理</a></el-dropdown-item>
+                        {% endif %}
+                        <el-dropdown-item><a href="/logout/">注销退出</a></el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                    {% else %}
+                        <a href="/login">登录</a>
+                        <a href="/register">注册</a>
+                {% endif %}
+            </div>
+        </nav>
+        {% block banner %}
+            {% banner 'index' %}
+        {% endblock %}
+        <main>
+            {% block main%}
+                <div class="main">
+                    {% csrf_token %}
+                    <div class="left">
+                        <div class="boutique_article card">
+                            <div class="title">
+                                <h2>精选文章</h2>
+                                <div class="switch_article_category">
+                                    <span :active="this_category === 'qianduan'" @click="switch_article_category('qianduan')">前端</span>
+                                    <span :active="this_category === 'houduan'" @click="switch_article_category('houduan')">后端</span>
+                                </div>
+                            </div>
+                            <div class="body">
+                                <ul v-show="this_category === 'qianduan'" class="qianduan">
+                                    {% for frontend in frontend_list %}
+                                        <li>
+                                        <div class="left">
+                                            <div>
+                                                <img src="{{ frontend.cover.url.url }}" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="right">
+                                            <h2><a href="/article/{{ frontend.nid }}">{{ frontend.title }}</a></h2>
+                                            <p>{{ frontend.abstract }}</p>
+                                            <span>{{ frontend_list.create_date }}</span>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                                <ul v-show="this_category === 'houduan'" class="houduan">
+                                    {% for backend in backend_list %}
+                                        <li>
+                                            <div class="left">
+                                                <div>
+                                                    <img src="{{ backend.cover.url.url }}" alt="">
+                                                </div>
+                                            </div>
+                                            <div class="right">
+                                                <h2><a href="/article/{{ backend.nid }}">{{ backend.title }}</a></h2>
+                                                <p>{{ backend.abstract }}</p>
+                                                <span>两天前</span>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="hotList card">
+                            <div class="title">
+                                <h2 id="pos">今日热搜</h2>
+                                <div>
+                                    <a href="#">查看更多></a>
+                                </div>
+                            </div>
+                            <div class="body">
+                                <div v-for="item in news_list" :key=""item.indedx>
+                                    <span class="index">[[item.index]]</span>
+                                    <a :href="[[item.link]]" target="_blank">[[item.title]]</a>
+                                    <span class="num">[[item.hotValue]]</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="all_article card">
+                            <div class="title">
+                                <h2>博客文章</h2>
+                            </div>
+                            <div class="body">
+                                <ul class="article_content">
+                                    {% for article in article_list %}
+                                        <li>
+                                        <div class="left">
+                                            <div>
+                                                <img src="{{ article.cover.url.url }}" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="right">
+                                            <h2><a href="/article/{{ article.nid }}/">{{ article.title }}</a></h2>
+                                            <p>
+                                                {{ article.content }}
+                                            </p>
+                                            <div class="article_info">
+                                                <span>
+                                                    <i class="far fa-clock">{{ article.create_date|date:'Y-m-d' }}</i>
+                                                </span>
+                                                <span>
+                                                    <i class="fas fa-thumbs-up">{{ article.digg_count }}</i>
+                                                </span>
+                                                <span>
+                                                    <i class="far fa-eye">{{ article.look_count }}</i>
+                                                </span>
+                                                <span>
+                                                    <i class="fas fa-comments">{{ article.comment_count }}</i>
+                                                </span>
+                                                <span>
+                                                    <i class ="fas fa-star-half-alt">{{ article.collects_count }}</i>
+                                                </span>
+                                            </div>
+                                            <button>
+                                                <a href="/article/{{ article.nid }}/" target="_blank">查看详情</a>
+                                            </button>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <ul class="pager">
+                                {{ pager.page_html|safe }}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="right">
+                        {% if advert_list.count %}
+                            <div class="advertisement card">
+                            <div class="title">
+                                <h2>独家广告</h2>
+                                <div>
+                                    <a href="#">申请入驻></a>
+                                </div>
+                            </div>
+                            <div class="body">
+                                {% generate_advert advert_list %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="tags card">
+                            <div class="title">
+                                <h2>标签云</h2>
+                            </div>
+                            <div class="body">
+                                <ul id="star_six_points">
+                                    <li>python</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="site_info card">
+                            <div class="title">
+                                <h2>站点信息</h2>
+                            </div>
+                            <div class="body">
+                                主要内容区域
+                            </div>
+                        </div>
+                        <div class="link card">
+                            <div class="title">
+                                <h2>友情链接</h2>
+
+                            </div>
+                            <div class="body">
+                                主要内容区域
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endblock %}
+        </main>
+        <footer>
+            <div class="left">
+                <p class="thank">Thank For</p>
+                <p class="site_info">
+                    <span>
+                        <img src="/static/my/img/footer/tencent.png" alt="">腾讯云服务器
+                    </span>
+                    <span>
+                        <img src="/static/my/img/footer/tencent.png" alt="">腾讯云SSL证书
+                    </span>
+                    <span>
+                        <img src="/static/my/img/footer/qiniu.png" alt="">七牛云存储
+                    </span>
+                </p>
+                <p class="version">
+                    <span>version</span>
+                    <span>1.0.0</span>
+                </p>
+                <p>建站日期2023.1.1</p>
+                <p class="beian">
+                    <a href="https://beian.miit.gov.cn">
+                        <img src="/static/my/img/footer/badges.png">
+                        备案号XXX
+                    </a>
+                </p>
+            </div>
+            <div class="right">
+                <div class="contact">
+                    <div>
+                        <img class="svg" src="/static/my/img/footer/qq_icon.svg">
+                        <img class="qq" src="/static/my/img/footer/qq.jpg">
+                    </div>
+                    <div>
+                        <img class="svg_wexin" src="/static/my/img/footer/wexin_icon.svg">
+                        <img class="wexin" src="/static/my/img/footer/wechart.jpg">
+                    </div>
+                     <div>
+                        <img class="svg_gitee" src="/static/my/img/footer/gitee_icon.svg">
+                        <img class="gitee" src="/static/my/img/footer/qq.png">
+                    </div>
+                     <div>
+                        <img class="svg_github" src="/static/my/img/footer/github_icon.svg">
+                        <img class="github" src="/static/my/img/footer/qq.png">
+                    </div>
+                     <div>
+                         <a href="https://www.bilibili.com" target="_blank">
+                             <img class="svg" src="/static/my/img/footer/bilibili_icon.svg">
+                         </a>
+                    </div>
+                </div>
+                <p>联系邮箱：517768506@qq.com</p>
+            </div>
+        </footer>
+    </div>
+    <script src="/static/vue/vue.js"></script>
+    <script src="/static/jquery/jquery.min.js"></script>
+    <!-- 引入组件库 -->
+    <script src="/static/elementui/index.js"></script>
+    <script src="/static/axios/axios.min.js"></script>
+    <script src="/static/itab/signaturekey.js"></script>
+
+    <script>
+        //请求中间件
+        axios.interceptors.request.use(request => {
+            if (request.method !== 'get') {
+                let csrftoken = document.querySelector('input[name="csrfmiddlewaretoken"]').value
+                request.headers['X-CSRFToken'] = csrftoken
+            }
+            return request
+        })
+        //响应中间件
+        axios.interceptors.response.use(
+            response => {
+                return response.data
+            }
+        )
+        // 动态导航栏
+        function dynamic_navigation(){
+            let a_list = document.querySelectorAll('#dynamic_nav>a')
+            let path = location.pathname
+            for (const a of a_list) {
+                let a_href = a.getAttribute('href')
+                if (a_href === path || a_href + '/' === path){
+                    a.classList.add('active')
+                }
+            }
+        }
+        dynamic_navigation()
+    new Vue({
+        el:'#app',
+        delimiters: ["[[","]]"],
+        data:{
+            theme: 'light',  //默认主题
+            this_category: 'qianduan',  //当前所在的位置
+            comment_content:'', //评论内容
+            isShowSlider:false, //悬浮目录
+            slide_list:[],
+            slide_text:'展开悬浮目录',
+            search_key:'',
+            news_list:[],    //新闻列表
+            news_init:[
+                {name:'微博', id:'KqndgxeLl9', url:'http://www.fengfengzhidao.com/static/my/img/news/weibo.png'},
+                {name:'知乎', id:'mproPpoq6O', url:'http://www.fengfengzhidao.com/static/my/img/news/zhihu.png'},
+                {name: '微信', id: 'WnBe01o371', url: 'http://www.fengfengzhidao.com/static/my/img/news/weixin.png'},
+                {name: '百度', id: 'Jb0vmloB1G', url: 'http://www.fengfengzhidao.com/static/my/img/news/baidu.png'},
+                {name: '36氪', id: 'Q1Vd5Ko85R', url: 'http://www.fengfengzhidao.com/static/my/img/news/36ker.png'},
+                {name: '哔哩哔哩', id: '74KvxwokxM', url: 'http://www.fengfengzhidao.com/static/my/img/news/bilibili.png'},
+                {name: '抖音', id: 'DpQvNABoNE', url: 'http://www.fengfengzhidao.com/static/my/img/news/douyin.png'},
+                {name: '拼多多', id: 'ARe1QZ2e7n', url: 'http://www.fengfengzhidao.com/static/my/img/news/pingduoduo.png'}
+            ],
+            news_active:'微博',
+            news_active_url:'http://www.fengfengzhidao.com/static/my/img/news/weibo.png',
+            mood_dialogVisible:false,
+            mood_add:{
+                name:'',
+                avatar_id:null,
+                content:'',
+                drawing:''
+            },
+            mood_show_drawing:[],
+            mood_comment_dialogVisible:false,
+            mood_add_comment:{
+                name:'',
+                content:''
+            }
+        },
+        created(){
+            {#调用初始化主题函数#}
+            this.init_theme()
+            let path = location.pathname
+            if(path.indexOf('article') !== -1){
+                this.init_slider()
+            }
+            if(path.indexOf('search') !== -1){
+                this.init_search_key()
+            }
+            if(path.indexOf('news') !== -1){
+                this.news_init_method(0)
+            }
+            if(path.indexOf('/') !== -1){
+                this.news_init_method(1)
+            }
+            setTimeout(()=>{
+                this.get_sidebar()
+                this.code_copy()
+            },1000)
+        },
+        methods:{
+            //初始化
+            init_theme(){
+                //读取存储的信息
+                let theme = localStorage.getItem('theme')
+                if(theme){
+                    this.theme = theme
+                }
+                let this_category = localStorage.getItem('this_category')
+                if(this_category){
+                    this.this_category = this_category
+                }
+            },
+            //设置主题
+            setTheme(themeName){
+                this.theme = themeName
+                //持久化存储
+                localStorage.setItem('theme',themeName)
+            },
+            //选择分类（前端、后端）
+            switch_article_category(categoryName){
+                this.this_category = categoryName
+                //持久化存储
+                localStorage.setItem('this_category',categoryName)
+            },
+            //发布评论
+            add_comment(nid){
+                axios.post(`/api/article/comment/${nid}/`, {content: this.comment_content}).then(res => {
+                    if (res.code){
+                        if (res.self){
+                            this.$refs[`comment_${res.self}`].focus()
+                        }
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    this.$message.success(res.msg)
+                    setTimeout(()=>{
+                        location.reload()
+                    },500)
+                })
+            },
+            //将被评论人的用户名写到placeholder
+            set_sub_placeholder(div, username,cid){
+                $(div).find('textarea').attr('placeholder',`@${username}`)
+                $(div).find('textarea').attr('cid',cid)
+
+            },
+            //展示子评论列表
+            show_sub_comment_list(e, username,cid){
+                let div = $(e.target).parents().parents().next()
+                $(div).slideToggle()
+                //div就是我们点回复的div
+                this.set_sub_placeholder(div,username,cid)
+            },
+            //子评论回复显示
+            sub_comment_set_placeholder(e,username,cid){
+               let div = $(e.target).parents('.sub_comment_list')
+               this.set_sub_placeholder(div,username,cid)
+           },
+            //发布子评论
+            add_sub_comment(e, nid, cid){
+                //nid文章id，cid评论id
+                axios.post(`/api/article/comment/${nid}/`, {
+                    content:$(e.target).prev().val(),
+                    pid:$(e.target).prev().attr('cid')
+                }).then(res =>{
+                    if (res.code){
+                        if (res.self){
+                            this.$refs[`sub_comment_${res.self}`].focus()
+                        }
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    this.$message.success(res.msg)
+                    setTimeout(()=>{
+                        location.reload()
+                    },500)
+                })
+            },
+            //删除子评论
+            delete_sub_comment(nid,aid,root_comment_nid){
+                this.$confirm('此操作将永久删除该评论, 是否继续?', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消',
+                  type: 'warning'
+                }).then(() => {
+                  axios.delete(`/api/article/comment/${nid}/`, {data: {
+                        aid, pid:root_comment_nid
+                      }}).then(res=>{
+                    if (res.code){
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    this.$message.success(res.msg)
+                    setTimeout(()=>{
+                        location.reload()
+                    },500)
+                })
+                }).catch(() => {
+                  this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                  });
+                });
+
+            },
+            //评论点赞
+            comment_digg(nid){
+                axios.post(`/api/comment/digg/${nid}/`).then(res=>{
+                    if(res.code){
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    e.target.innerHTML = `点赞（${res.data}）`
+                    this.$message.success(res.msg)
+                })
+            },
+            //文章点赞
+            article_digg(e,nid){
+                let dom = e.target
+                dom.classList.add('show')
+                axios.post(`/api/article/digg/${nid}/`).then(res=>{
+                    if(res.code){
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    $(dom).next().text(res.data)
+                    this.$message.success(res.msg)
+                })
+                let timer = null
+                clearTimeout(timer)
+                timer = setTimeout(()=>{
+                    dom.classList.remove('show')
+                },1000)
+            },
+            //文章收藏
+            article_collect(e,nid){
+                let dom = e.target
+                axios.post(`/api/article/collects/${nid}/`).then(res=>{
+                    if(res.code){
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    this.$message.success(res.msg)
+                    $(dom).next().text(res.data)
+                    if (res.isCollects){
+                        dom.classList.add('show')
+                        return
+                    }
+                    dom.classList.remove('show')
+                })
+            },
+            //回到顶部
+            get_to_top(){
+                $('html,body').animate({
+                    scrollTop:0
+                }, 1000)
+            },
+            init_slider(){
+                let flag = localStorage.getItem('isShowSlider')
+                if(flag){
+                    flag = eval(flag)
+                    if (flag){
+                        this.isShowSlider = true
+                        this.$nextTick(()=>{
+                            this.sliderChange(true)
+                        })
+                    }
+                    return
+                }
+            },
+            //悬浮目录是否显示
+            sliderChange(val){
+                let dom = this.$refs.slider
+                localStorage.setItem('isShowSlider', val)
+                if(val){
+                    dom.classList.add('show')
+                    this.slide_text = '关闭悬浮目录'
+                    return
+                }
+                dom.classList.remove('show')
+                this.slide_text = '展开悬浮目录'
+            },
+            //悬浮目录
+            get_sidebar(){
+                let content = $('#article_content')
+                let h_list =content.children('h1,h2,h3,h4')
+                let lis = []
+                for(let i = 0;i<h_list.length;i++){
+                    let c = h_list[i].innerText
+                    let tagName = h_list[i].tagName
+                    let tagId = h_list[i].id
+                    let ele = {
+                        tagName,
+                        c,
+                        pos:'#' + tagId
+                    }
+                    lis.push(ele)
+                }
+                lis.push({
+                    tagName: 'H1',
+                    c:'去评论吧！',
+                    pos:'.comment_submit'
+                })
+                this.slide_list = lis
+            },
+            //点击定位到标题位置
+            go_side_bar(selector,e){
+                $('.slider_bar .body>p').css('color','')
+                e.target.style.color = '#ff9800'
+                let box = $(selector)
+                let pos = box.offset()
+                pos.top = pos.top - 80
+                $('html,body').animate({scrollTop: pos.top},600)
+            },
+            // 点击搜索
+            search(path="/search/",target='_blank'){
+                let box = document.querySelector('.search')
+                if (!box.classList.contains('show_search')){
+                    box.classList.add('show_search')
+                    return
+                }
+                if (!this.search_key){
+                    box.classList.remove('show_search')
+                    return;
+                }
+                // 打开标签页
+                window.open(path + '?key=' + this.search_key, name=target)
+
+            },
+            // 初始化搜索
+            init_search_key(){
+                let dom = document.querySelector('.search_key_input')
+                let key = dom.getAttribute('data')
+                this.search_key = key
+            },
+            // 代码一键复制
+            code_copy(){
+                $('pre').each(function (){
+                    let copy = $('<i title="copy" class="el-icon-document-copy code-copy"></i>')
+                    $(this).append(copy)
+                })
+                $('pre i.code-copy').click(e => {
+                    let text_list = $(e.target).prev().find('code')
+                    let text = ''
+                    text_list.each(function(){
+                        text += $(this).text() + '\n'
+                    })
+                    let element = $('<textarea>' + text + '</textarea>')
+                    $('body').append(element)
+                    element[0].select()
+                    document.execCommand('Copy')
+                    element.remove()
+                    // 复制成功的提示信息
+                    this.$message.success('复制成功')
+                })
+            },
+            // 获取热搜数据
+            get_news_data(id, name, url, flag, size){
+                if(name === this.news_active && !flag){
+                    return
+                }
+                this.news_active = name
+                this.news_active_url = url
+                let data = {
+                    id,
+                }
+                if (size) {
+                    data.size = size
+                }
+                axios.post('/api/news/', data, {
+                    headers: {
+                        signaturekey: Lm()
+                }
+                }).then(res=>{
+                    this.news_list = res.data
+                })
+            },
+            // 初始化获取热搜数据
+            news_init_method(size){
+                this.get_news_data('KqndgxeLl9','微博','http://www.fengfengzhidao.com/static/my/img/news/weibo.png', true, size)
+            },
+            // 回复心情
+            mood_show_comment_list(e){
+                let div = $(e.target).parent().parent().next()
+                div.slideToggle()
+            },
+            // 发布心情
+            mood_add_method(){
+                axios.post('/api/moods/', this.mood_add).then(res=>{
+                    if (res.code){
+                        this.$message.error(res.msg)
+                        this.$refs[`mood_add__${res.self}`].focus()
+                        return
+                    }
+                    this.$message.success(res.msg)
+                    setTimeout(()=>{
+                        location.reload()
+                    },1000)
+                })
+            },
+            // 删除心情
+            mood_delete(nid, e){
+                 this.$confirm('此操作将永久删除该心情, 是否继续?', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消',
+                  type: 'warning'
+                }).then(() => {
+                  axios.delete(`/api/moods/${nid}/`).then(res=>{
+                      if (res.code){
+                        this.$message.error(res.msg)
+                        return
+                      }
+                      this.$message.success(res.msg)
+                      setTimeout(()=>{
+                          $(e.target).parents('.mood').remove()
+                      },500)
+                  })
+                }).catch(() => {
+                  this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                  });
+                });
+            },
+            //打开回复心情的对话框
+            mood_comment_dialogVisible_show(nid){
+                this.mood_comment_dialogVisible = true
+                this.mood_comment_add_method.nid = nid
+            },
+            // 回复心情
+            mood_comment_add_method(){
+                let nid = this.mood_comment_add_method.nid
+                axios.post(`/api/mood_comments/${nid}/`,this.mood_add_comment).then(res=>{
+                    if (res.code){
+                        this.$message.error(res.msg)
+                        this.$refs[`mood_comment_add__${res.self}`].focus()
+                        return
+                      }
+                      this.$message.success(res.msg)
+                      setTimeout(()=>{
+                          location.reload()
+                      },500)
+                })
+            },
+            // 删除回复心情评论
+            mood_sub_comment_delete(nid, mood_id, e){
+                 this.$confirm('此操作将永久删除该心情的回复, 是否继续?', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消',
+                  type: 'warning'
+                }).then(() => {
+                  axios.delete(`/api/mood_comments/${nid}/`,{
+                      data: {
+                          mood_id
+                      }
+                  }).then(res=>{
+                      if (res.code){
+                        this.$message.error(res.msg)
+                        return
+                      }
+                      this.$message.success(res.msg)
+                      setTimeout(()=>{
+                          $(e.target).parents('.mood').find('.mood_comment_num').text(`评论（${res.data}）`)
+                          $(e.target).parents('li').remove()
+                      },500)
+                  })
+                }).catch(() => {
+                  this.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                  });
+                });
+            },
+            // 心情点赞,心情评论点赞
+            mood_digg(path,nid,e){
+                axios.put(`/api/${path}/${nid}/`).then(res => {
+                    if(res.code){
+                        this.$message.error(res.msg)
+                        return
+                    }
+                    this.$message.success(res.msg)
+                    $(e.target).text(`点赞（${res.data}）`)
+                })
+            },
+        },
+        watch:{
+            'mood_add.drawing'(n,o){
+                this.mood_show_drawing=n.split('\n')
+            }
+        }
+    })
+
+</script>
+{% block js %}
+    <script>
+        //轮播图
+        //获取轮播图需要的div
+        let menu_img =  document.querySelectorAll('.dynamic_shuffl')
+        //获取长度
+        let  menu_length = menu_img.length
+        //初始位置
+        let index = 0
+        let  timer = null
+        clearInterval(timer)
+        timer = setInterval(()=>{
+            index++
+            //到头了
+            if(index === menu_length){
+                index = 0
+            }
+            //样式复原操作
+            for (let i of menu_img) {
+            i.style.opacity = 0
+            }
+            menu_img[index].style.opacity = 1
+        },3000)
+        //动态导航条
+        let nav = document.querySelector('.nav_bg');
+        let path = location.pathname
+        let slider;
+        slider = document.querySelector('.slider_bar')
+        let top1 = 0;
+        if (path.indexOf('article') !== -1){
+            top1 = $(slider).offset().top - 80
+        }
+        window.onscroll = function (){
+            let top = document.documentElement.scrollTop
+            if (top >= 200) {
+                nav.classList.add('show')
+            }else{
+                nav.classList.remove('show')
+            }
+            if(slider){
+                if (top >= top1){
+                slider.classList.add('fixed')
+                }else{
+                    slider.classList.remove('fixed')
+                }
+            }
+    }
+    </script>
+{% endblock %}
+{% block article_js %}
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,120 @@
+@import "./pager";
+.main {
+  width: 1200px;
+  .add_mood {
+    width: 100%;
+  }
+  .mood {
+    margin-top: 40px;
+    > .left {
+      width: 90px;
+      img {
+        width: 70px;
+        height: 70px;
+        border-radius: 10px;
+      }
+    }
+    > .right {
+      width: calc(100% - 70px);
+      background-color: white;
+      border-radius: 5px;
+      position: relative;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      padding: 10px 20px;
+      &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        left: -20px;
+        top: 25px;
+        border-width: 10px;
+        border-style: solid;
+        border-color: transparent white transparent transparent;
+      }
+      .name {
+        margin-bottom: 5px;
+      }
+      .content {
+        margin-bottom: 5px;
+      }
+      .drawing {
+        img {
+          width: 100px;
+          border-radius: 5px;
+          margin-right: 10px;
+          margin-bottom: 10px;
+        }
+      }
+      .info {
+        font-size: 14px;
+        justify-content: space-between;
+        > .three>span {
+          cursor: pointer;
+          margin-left: 10px;
+        }
+        .delete {
+          color: #dd6161;
+        }
+      }
+
+      .sub_comment_list {
+        display: none;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        li {
+          list-style: none;
+          .left {
+            width: 70px;
+            img {
+              width: 50px;
+              height: 50px;
+              border:1px solid #f0eeee;
+              border-radius: 5px;
+            }
+          }
+          .right {
+            width: calc(100% - 70px);
+            .info {
+              justify-content: space-between;
+            }
+          }
+        }
+      }
+      .rep_mood {
+        width: 100%;
+        margin-top: 10px;
+      }
+    }
+  }
+  .add_mood_content {
+    >div {
+      margin-bottom: 20px;
+      >div,>ul {
+        margin-top: 5px;
+      }
+      .avatar_list {
+        flex-wrap: wrap;
+        list-style: none;
+        >li {
+          margin-right: 10px;
+          margin-bottom: 10px;
+          .el-radio {
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+      img {
+        width: 50px;
+        height: 50px;
+        border-radius: 5px;
+      }
+    }
+    .show_drawing {
+      img {
+        width: initial;
+        margin-right: 10px;
+      }
+    }
+  }
+}

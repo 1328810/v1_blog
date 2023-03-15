@@ -1,0 +1,131 @@
+body {
+  width: 100%;
+  height: 100%;
+  #app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  }
+}
+main {
+  width: 550px;
+  min-height: 575px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0,0,0.2);
+  position: relative;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  .bottom {
+    img {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      height: 170px;
+      transform: translateX(-50%);
+    }
+  }
+  .top {
+    padding: 40px 20px 20px 20px;
+    .title {
+
+      text-align: center;
+      a {
+        color: #808595;
+      }
+      a.active {
+        color: #ff9800;
+      }
+    }
+    h2 {
+      display: flex;
+      color: #ff9800;
+      justify-content: center;
+    }
+    .login_forms {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      input {
+        margin-bottom: 20px;
+        border: 1px solid #f0eeee;
+        outline: none;
+        height:30px;
+        border-radius: 5px;
+        padding-left: 20px;
+        transition: all 0.3s;
+
+        &:focus {
+        border: 1px solid #ff9800;
+        }
+      }
+      input.register_input {
+        margin-bottom: 10px;
+      }
+      .code {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        input {
+          width: 60%;
+        }
+        img {
+          height: 40px;
+          border-radius: 5px;
+          cursor: pointer;
+          border: 1px solid #f0eeee;
+        }
+      }
+      >button {
+        border: none;
+        cursor: pointer;
+        height: 40px;
+        background-color: #ff9800;
+        border-radius: 10px;
+      }
+    }
+    .other_login {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      >p {
+        font-size: 14px;
+        color: #808595;
+      }
+      &:before {
+        position: absolute;
+        content: '';
+        display: flex;
+        width: 200px;
+        height: 1px;
+        background-color: #808595;
+        left: 0;
+        top: 8px;
+      }
+      &:after {
+        position: absolute;
+        content: '';
+        display: flex;
+        width: 200px;
+        height: 1px;
+        background-color: #808595;
+        right: 0;
+        top: 8px;
+      }
+      >div {
+        margin-top: 10px;
+        img {
+          margin-right: 10px;
+          width: 40px;
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  }
+}
